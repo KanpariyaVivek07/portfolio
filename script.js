@@ -236,13 +236,138 @@ document.addEventListener('DOMContentLoaded', () => {
             const y = e.clientY - rect.top;
             const centerX = rect.width / 2;
             const centerY = rect.height / 2;
-            const rotateX = (y - centerY) / 25;
-            const rotateY = (centerX - x) / 25;
-            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-8px) scale(1.02)`;
+            const rotateX = (y - centerY) / 20;
+            const rotateY = (centerX - x) / 20;
+            const scale = 1.03;
+            const translateZ = 20;
+            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(${translateZ}px) scale(${scale})`;
+            card.style.boxShadow = `${-rotateY * 2}px ${rotateX * 2}px 40px rgba(99, 102, 241, 0.2)`;
         });
         card.addEventListener('mouseleave', () => {
             card.style.transform = '';
+            card.style.boxShadow = '';
         });
     });
+
+    // Magnetic effect on buttons
+    document.querySelectorAll('.btn').forEach(btn => {
+        btn.addEventListener('mousemove', e => {
+            const rect = btn.getBoundingClientRect();
+            const x = e.clientX - rect.left - rect.width / 2;
+            const y = e.clientY - rect.top - rect.height / 2;
+            btn.style.transform = `translate(${x * 0.15}px, ${y * 0.15}px) scale(1.03)`;
+        });
+        btn.addEventListener('mouseleave', () => {
+            btn.style.transform = '';
+        });
+    });
+
+    // Parallax on hero
+    const heroContent = document.querySelector('.hero-content');
+    const heroVisual = document.querySelector('.hero-visual');
+
+    document.addEventListener('mousemove', e => {
+        if (window.innerWidth > 900) {
+            const moveX = (e.clientX - window.innerWidth / 2) / 50;
+            const moveY = (e.clientY - window.innerHeight / 2) / 50;
+            if (heroContent) {
+                heroContent.style.transform = `translate(${moveX * 0.5}px, ${moveY * 0.5}px)`;
+            }
+            if (heroVisual) {
+                heroVisual.style.transform = `translate(${-moveX * 0.8}px, ${-moveY * 0.8}px)`;
+            }
+        }
+    });
+
+    // Smooth reveal on scroll
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('revealed');
+                revealObserver.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.glass-3d, .hero-content, .footer').forEach(el => {
+        el.classList.add('reveal-on-scroll');
+        revealObserver.observe(el);
+    });
+
+    // Tilt effect on skill icons
+    document.querySelectorAll('.skill-icon-wrap').forEach(icon => {
+        icon.addEventListener('mousemove', e => {
+            const rect = icon.getBoundingClientRect();
+            const x = e.clientX - rect.left - rect.width / 2;
+            const y = e.clientY - rect.top - rect.height / 2;
+            icon.style.transform = `rotateY(${x * 0.3}deg) rotateX(${-y * 0.3}deg) scale(1.15)`;
+        });
+        icon.addEventListener('mouseleave', () => {
+            icon.style.transform = '';
+        });
+    });
+
+    // Smooth hover on social icons
+    document.querySelectorAll('.social-3d, .footer-socials a, .about-socials a, .contact-socials a').forEach(icon => {
+        icon.addEventListener('mouseenter', () => {
+            icon.style.transform = 'translateY(-5px) scale(1.15) rotateZ(5deg)';
+        });
+        icon.addEventListener('mouseleave', () => {
+            icon.style.transform = '';
+        });
+    });
+
+    // Text scramble effect on heading
+    const scrambleText = (el) => {
+        const chars = '!@#$%^&*()_+{}|:<>?';
+        const original = el.dataset.text || el.textContent;
+        el.dataset.text = original;
+        let iteration = 0;
+        const interval = setInterval(() => {
+            el.textContent = original
+                .split('')
+                .map((char, index) => {
+                    if (index < iteration) return original[index];
+                    return chars[Math.floor(Math.random() * chars.length)];
+                })
+                .join('');
+            if (iteration >= original.length) clearInterval(interval);
+            iteration += 1 / 3;
+        }, 30);
+    };
+
+    // Trigger scramble on section heading hover
+    document.querySelectorAll('.section-heading').forEach(heading => {
+        heading.addEventListener('mouseenter', () => scrambleText(heading));
+    });
+
+    // Smooth scroll with easing
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                const offsetTop = target.offsetTop - 70;
+                window.scrollTo({
+                    top: offsetTop,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+
+    // Dynamic gradient on cursor
+    let gradientAngle = 0;
+    const updateGradient = () => {
+        gradientAngle += 0.5;
+        document.documentElement.style.setProperty('--cursor-gradient', `linear-gradient(${gradientAngle}deg, #6366f1, #ec4899)`);
+        requestAnimationFrame(updateGradient);
+    };
+    updateGradient();
 
 });
