@@ -322,30 +322,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Text scramble effect on heading
-    const scrambleText = (el) => {
-        const chars = '!@#$%^&*()_+{}|:<>?';
-        const original = el.dataset.text || el.textContent;
-        el.dataset.text = original;
-        let iteration = 0;
-        const interval = setInterval(() => {
-            el.textContent = original
-                .split('')
-                .map((char, index) => {
-                    if (index < iteration) return original[index];
-                    return chars[Math.floor(Math.random() * chars.length)];
-                })
-                .join('');
-            if (iteration >= original.length) clearInterval(interval);
-            iteration += 1 / 3;
-        }, 30);
-    };
-
-    // Trigger scramble on section heading hover
-    document.querySelectorAll('.section-heading').forEach(heading => {
-        heading.addEventListener('mouseenter', () => scrambleText(heading));
-    });
-
     // Smooth scroll with easing
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function(e) {
